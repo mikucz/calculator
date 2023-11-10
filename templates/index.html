@@ -1,0 +1,70 @@
+<html>
+  <body>
+    <form>
+      <input
+        type="number"
+        id="number1"
+        name="number1"
+        step="0.01"
+        required
+        size="10"
+      />
+      <select name="operator" id="operator"></select>
+      <input
+        type="number"
+        id="number2"
+        name="number2"
+        step="0.01"
+        required
+        size="10"
+      />
+      =
+      <input type="number" id="result" name="result" step="any" size="10" />
+      <button>Count</button>
+      <pre><div id="errors"></div></pre>
+    </form>
+  </body>
+  <script>
+    fetch("/api/v1/calculator/operators")
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        const operation = document.getElementById("operator");
+        data.map(({ operator }) => {
+          operation.add(new Option(operator, operator));
+        });
+      });
+
+    document.addEventListener("submit", function (event) {
+      event.preventDefault();
+      const data = Object.fromEntries(new FormData(event.target).entries());
+      const errors = document.getElementById("errors");
+      errors.innerHTML = "";
+
+      fetch("/api/v1/calculator/", {
+        method: "POST",
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          numbers: [data.number1, data.number2],
+          operators: [data.operator],
+        }),
+      })
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          }
+          return Promise.reject(res);
+        })
+        .then((res) => (document.getElementById("result").value = res.result))
+        .catch((res) => {
+          res.json().then((data) => {
+            errors.innerHTML = `<p>${JSON.stringify(data, null, 2)}</p>`;
+          });
+        });
+    });
+  </script>
+</html>
