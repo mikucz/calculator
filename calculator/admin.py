@@ -1,3 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from calculator.models import Operator
+
+
+class OperatorAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(Operator, OperatorAdmin)
