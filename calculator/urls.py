@@ -7,5 +7,6 @@ router = routers.DefaultRouter()
 router.register(r"operators", views.OperatorViewSet)
 
 urlpatterns = [
+    path("calculator/", views.CalculatorView.as_view(), name="calculator"),
     path("calculator/", include(router.urls)),
 ]
